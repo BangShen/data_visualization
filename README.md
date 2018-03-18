@@ -21,6 +21,8 @@
 
 * [css布局](https://www.w3schools.com/Css)
 * [lengend布局](https://stackoverflow.com/questions/13573771/adding-a-chart-legend-in-d3)
+* [api接口文档](https://developer.mozilla.org/zh-CN/)
+* [精通D3.js交互式数据可视化高级编程](https://book.douban.com/subject/27071903/)这本书的确不错，对很多细节解释的比较清楚
 
 
 #data_visualization
