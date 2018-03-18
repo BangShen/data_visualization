@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+  <style type="text/css">
+    h1 {
+      text-align: center;
+      color: rgb(219,112,147);
+      font-family: arial;
+      font-size:30;
+      font-style: italic;
+
+    }
+    p {
+      text-align: center;
+      color: blue;
+      font-family: arial;
+      font-size: 15
+    }
+
+
+    .axis path,
+    .axis line{
+      fill:none;
+      stroke:rgb( 105,105,105);
+      shape-rendering: crispEdfes;
+      }
+    .tick {
+        fill: none;
+        stroke: black;
+      }
+
+    div.bottoms{
+        position: fixed;
+        top: 120px;
+        left: 900px;
+    }
+
+    .keys{
+      position: fixed;
+      top:200px;
+      left: 1200px;
+    }
+
+    /*.x_axis_text{
+      position: fixed;
+      top: 120px;
+      left: 500px;
+    }*/
+
+    div.bottoms div {
+        background-color: rgb(251, 213, 127);
+        padding: 10px;
+        margin: 2px;
+        display: inline;
+      }
+
+    .legend {
+          font-size: 18px;
+          font-family: arial;
+          font-style: italic;
+          color: 'blue';
+        }
+        rect {
+          stroke-width: 2;
+        }
+
+  </style>
+    <script type="text/javascript">
+      function draw(data) {
+      
+      //debugger;
+        "use strict";
+        var width = 1200,
+            height = 450,
+            margin = {left:100,top:30,right:20,bottom:60};
+        var radius = 4;
+        var color = 'red'
+        d3.select('body')
+          .append('h1')
+          .text('Avg and HR over Height,Weight and Handness');
+        d3.select('body')
+          .append('p')
+          .text('A dataset containing 1157 baseball players including their handedness(right or left),height(in inches),weight(in pounds)，batting average, and home runs');
+
+
+        // svg
+        var svg = d3.select("body")  /*这里面的意思就是选中了html中的body，然后在body中添加svg元素和g元素，然后对svg
+        元素设置width和height属性，而这些改动都可以在网页的检查工具中的elements中找到对应的变化*/
+          .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+        // x, y scale 
+
+
+        var x_extent = d3.extent(data,function(d){
+            return d['height'];
+        });
+        var y_extent = d3.extent(data,function (d) {
+          // body...
+            return d['HR']   //this will return the range of HR, that is [0,99]
+        })
+
+        var x_scale = d3.scale.linear()
+                                .domain(x_extent)
+                                .range([margin.left,width-margin.right]);
+        var y_scale = d3.scale.linear()
+                                .domain(y_extent)
+                                .range([height-margin.bottom,margin.top]);   //这里面要注意svg的y轴从上到下的增加的，这个和平时的不一样，但是完全可以靠这种变化转化过来
+        var x_axis_generator = d3.svg.axis()
+                                      .scale(x_scale)
+                                      .orient('bottom')
+                                      .ticks(14);
+        var y_axis_generator = d3.svg.axis()
+                                      .scale(y_scale)
+                                      .orient('left');
+                                      //.ticks(4);
+        var x_axis = svg.append('g')
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+                        .call(x_axis_generator);
+        var y_axis = svg.append('g')
+                        .attr("class", "y axis")
+                        .attr("transform", "translate(" + (margin.left) + ",0)")
+                        .call(y_axis_generator);
+        var x_axis_text = x_axis.append('text')
+                          .attr('class','x_axis_text')
+                          .text('height')
+                          .attr('x',600)
+                          .attr('y',30)
+                          .attr('dy','1em')
+                          .attr('font-family','arial');         
+        var y_axis_text = y_axis.append('text')
+                          .text('HR')
+                          .attr('font-family','arial')
+                          .attr('x',5)
+                          .attr('y',margin.top)
+                          .attr('dy','1em')
+                          .attr('color','black');
+                     
+                          
+
+        // color_diff
+        function color_diff(val){
+          if(val == 'R')
+            {
+              return  'rgb(219,112,147)';
+        }
+        else if (val == 'L'){
+          return  'rgb(72,61,139)';
+        }
+        else {
+          return  'rgb(46,139,87)';
+        }
+
+
+        }
+
+
+        // circles
+        var circle_groups = svg.selectAll('.circle')
+                        .data(data)
+                        .enter()  
+                        .append('g')
+                        .attr('class','circle')
+        var circles = circle_groups.append('circle')
+                        .attr("cx", function(d) {
+                                  return x_scale(d['height']-0.2*Math.random());
+                              })
+                        .attr("cy", function(d) {
+                            return y_scale(d["HR"]);
+                        })
+                        .attr("r", radius)
+                        .attr("fill", function(d){
+                          return color_diff(d['handedness']);
+                          })
+                        .attr('fill-opacity','0.5');
+          function update_axis(key_word_1,key_word_2){
+            x_extent = d3.extent(data,function(d){
+                  return d[key_word_1];
+                      });
+            y_extent = d3.extent(data,function(d){
+                  return d[key_word_2];
+            })
+            x_scale = d3.scale.linear()
+                  .range([margin.left,width-margin.right])
+                  .domain(x_extent);
+            y_scale = d3.scale.linear()
+                  .range([height-margin.bottom,margin.top])
+                  .domain(y_extent);
+            x_axis_generator = d3.svg.axis()
+                  .scale(x_scale)
+                  .orient("bottom")
+                  .ticks(14);
+            y_axis_generator = d3.svg.axis()
+                  .scale(y_scale)
+                  .orient('left');
+
+            x_axis.transition()
+                 .duration(500)
+                 .call(x_axis_generator);
+            y_axis.transition()
+                  .duration(500)
+                  .call(y_axis_generator)
+            x_axis_text.transition()
+                  .duration(500)
+                  .text(key_word_1);
+            y_axis_text.transition()
+                  .duration(500)
+                  .text(key_word_2);
+
+          }
+          function update_circle(key_word_1, key_word_2){
+                circles.transition()
+                 .duration(500)
+                 .attr("cx", function(d) {
+                   return x_scale(d[key_word_1]-0.2*Math.random());
+             })
+                 .attr("cy", function(d) {
+                    return y_scale(d[key_word_2]);
+              });
+
+
+          }
+          function update(key_word_1,key_word_2){
+            update_axis(key_word_1,key_word_2);
+            update_circle(key_word_1,key_word_2);
+             
+
+          }
+
+
+        //categroy
+          var catatory = [{"btn_text":"Height-avg","content_1":"height",'content_2':'avg'},
+                          {"btn_text":"Weight-avg","content_1":"weight",'content_2':'avg'},
+                          {"btn_text":"Height-HR","content_1":"height",'content_2':'HR'},
+                          {"btn_text":"Weight-HR","content_1":"weight",'content_2':'HR'}];
+
+          var buttons = d3.select("body")
+            .append("div")
+            .attr("class", "bottoms")
+            .selectAll("div")
+            .data(catatory)   //定义了按钮，且按钮的值来自于catatory这个中间
+            .enter()
+            .append("div")
+            .attr("class","bottom")
+            .attr('width','30px')
+            .attr('height','5px')
+            .text(function(d) {
+                return d["btn_text"];
+            })
+            .style("color", "black")
+            .style("background", "rgb(251, 201, 127)")
+            .style('font-family','arial');
+          //d3.select(".bottoms").select("div").style("background", "red")
+            //          .style("color", "white");
+          
+          // 定义点击按钮之后的事件
+
+          buttons.on("click", function(d) {   // 这段代码的意思是click之后对.bpttoms下的div进行改动的颜色会发生变化等
+              d3.select(".bottoms")
+                  .selectAll("div")
+                  .transition()
+                  .duration(500)
+                  .style("color", "black")
+                  .style("background", "rgb(251, 201, 127)");
+
+              d3.select(this)         //这段的意思对于选中的这个对象
+                  .transition()
+                  .duration(500)
+                  .style("background", "lightBlue")    //
+                  .style("color", "white");
+              update(d["content_1"],d['content_2']);
+          });
+
+        var legend_content = [{'color':'rgb(219,112,147)','content':'Right'},
+                          {'color':'rgb(72,61,139)','content':'Left'},
+                          {'color':'rgb(46,139,87)','content':'Both'}];
+        var legendRectSize = 18;
+        var legendSpacing = 4;
+
+        var legend = svg.selectAll('.legend')
+                    .data(legend_content)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', function(d, i) {
+                      var height = legendRectSize + legendSpacing;
+                      var offset =  height * 3 / 2;
+                      var horz = -2 * legendRectSize;
+                      var vert = i * height - offset;
+                      return 'translate(' + horz + ',' + vert + ')';
+                    });
+        legend.append('circle')
+                    //.attr('width', legendRectSize)
+                    //.attr('height', legendRectSize)
+                    .attr('cx',1135)
+                    .attr('cy',147)
+                    .attr('r',5)
+                    .attr('fill', function(d){
+                      return d['color'];
+                    });
+                    //.style('stroke', legend_content['color']);
+        legend.append('text')
+                    .attr('x', 1150)
+                    .attr('y', 150)
+                    .text(function(d) { return d['content']; });
+
+
+         var  legend = svg.append("g")
+                .attr("class","legend")
+                .attr("transform","translate(50,30)")
+                .style("font-size","12px")
+                .call(d3.legend)
+
+ 
+    };
+      </script>
+  </head>
+<body>
+  <script type="text/javascript">
+  /*
+    Use D3 (not dimple.js) to load the TSV file
+    and pass the contents of it to the draw function
+    */
+  d3.csv("baseball_data_final_reports.csv", draw);   //利用d3.csv把数据加载进来后传给draw函数
+  </script>
+</body>
+</html>
