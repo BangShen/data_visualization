@@ -28,7 +28,7 @@
       shape-rendering: crispEdfes;
       }
     .tick {
-        fill: none;
+        fill: black;
         stroke: black;
       }
 
@@ -89,7 +89,7 @@
         // svg
         var svg = d3.select("body")  /*这里面的意思就是选中了html中的body，然后在body中添加svg元素和g元素，然后对svg
         元素设置width和height属性，而这些改动都可以在网页的检查工具中的elements中找到对应的变化*/
-          .append("svg")
+            .append("svg")
             .attr("width", width)
             .attr("height", height)
         // x, y scale 
@@ -127,13 +127,13 @@
                         .call(y_axis_generator);
         var x_axis_text = x_axis.append('text')
                           .attr('class','x_axis_text')
-                          .text('height')
+                          .text('height(in)')
                           .attr('x',600)
                           .attr('y',30)
                           .attr('dy','1em')
                           .attr('font-family','arial');         
         var y_axis_text = y_axis.append('text')
-                          .text('HR')
+                          .text('Home Run')
                           .attr('font-family','arial')
                           .attr('x',5)
                           .attr('y',margin.top)
@@ -146,13 +146,13 @@
         function color_diff(val){
           if(val == 'R')
             {
-              return  'rgb(219,112,147)';
+              return  'black';
         }
         else if (val == 'L'){
-          return  'rgb(72,61,139)';
+          return  'rgb(220,20,60)';
         }
         else {
-          return  'rgb(46,139,87)';
+          return  'rgb(0,100,0)';
         }
 
 
@@ -206,10 +206,27 @@
                   .call(y_axis_generator)
             x_axis_text.transition()
                   .duration(500)
-                  .text(key_word_1);
+                  .text(function(){
+                    if (key_word_1 == 'height'){
+                      return 'height(in)';
+                    }
+                    else {
+                      return 'weight(lb)';
+                    }
+                  });
+                    
+                    
             y_axis_text.transition()
                   .duration(500)
-                  .text(key_word_2);
+                  .text(
+                    function(){
+                      if (key_word_2 == 'HR'){
+                        return 'Home Run';
+                      }
+                      else {
+                        return 'avg'
+                      }
+                    });
 
           }
           function update_circle(key_word_1, key_word_2){
@@ -254,8 +271,7 @@
             .style("color", "black")
             .style("background", "rgb(251, 201, 127)")
             .style('font-family','arial');
-          //d3.select(".bottoms").select("div").style("background", "red")
-            //          .style("color", "white");
+ 
           
           // 定义点击按钮之后的事件
 
@@ -275,9 +291,9 @@
               update(d["content_1"],d['content_2']);
           });
 
-        var legend_content = [{'color':'rgb(219,112,147)','content':'Right'},
-                          {'color':'rgb(72,61,139)','content':'Left'},
-                          {'color':'rgb(46,139,87)','content':'Both'}];
+        var legend_content = [{'color':'black','content':'Right'},
+                          {'color':'rgb(220,20,60)','content':'Left'},
+                          {'color':'rgb(0,100,0)','content':'Both'}];
         var legendRectSize = 18;
         var legendSpacing = 4;
 
