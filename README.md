@@ -21,7 +21,7 @@
 
 
 ## 迭代和改进
-第一次绘图的绘图的结果：[链接]（http://bl.ocks.org/BangShen/eb691f31e3aa5e62ef7a2de332f902bd）</br>
+第一次绘图的绘图的结果：[链接](http://bl.ocks.org/BangShen/eb691f31e3aa5e62ef7a2de332f902bd)</br>
 这个只是第一次尝试，没有添加互动按钮，也没有将不同handedness的运动员用颜色区分开
 
 
